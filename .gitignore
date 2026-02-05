@@ -3,3 +3,4 @@
 *.pyc
 products.db
 .venv
+.vscode
