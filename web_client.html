@@ -59,7 +59,7 @@ function registerUser(){
   })
   .then(res => res.json())
   .then(response => {
-    document.getElementById("resgisterMessage").innerText = response.message ||response.error;
+    document.getElementById("registerMessage").innerText = response.message ||response.error;
   })
   .catch(err =>{
     console.error("Failed to register", err);

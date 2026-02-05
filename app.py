@@ -55,28 +55,66 @@ def get_db_connection():
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
-    
-@app.route("/init", methods=["GET"])
-def init_db():
-    conn = get_db_connection()
-    conn.execute("""
-                 CREATE TABLE IF NOT EXISTS products(
-                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                 name TEXT NOT NULL,
-                 price REAL NOT NULL
-                 )
-                 """)
-    conn.execute("""
-                 CREATE TABLE IF NOT EXISTS users(
-                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                 username TEXT UNIQUE NOT NULL,
-                 password TEXT NOT NULL
-                 )
-                 """)
-    conn.commit()
-    conn.close()
-    return jsonify({"message": "Database Inint complete"})
+   
 
+def init_db():
+    """Initialize the database and create tables if they don't exist."""
+    print("Initializing Database...") # Log to Render logs
+    conn = get_db_connection()
+    try:
+        # Create tables
+        conn.execute('''CREATE TABLE IF NOT EXISTS products(
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            name TEXT NOT NULL,
+                            price REAL NOT NULL
+                        )''')
+        conn.execute('''CREATE TABLE IF NOT EXISTS users(
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            username TEXT UNIQUE NOT NULL,
+                            password TEXT NOT NULL
+                        )''')
+        conn.commit()
+        print("Database tables ensured.") # Log to Render logs
+    except Exception as e:
+        print(f"Error during DB initialization: {e}") # Log error
+        raise e # Re-raise to potentially cause a startup error if critical
+    finally:
+        conn.close()
+        return jsonify({"message": "Database Inint complete"})
+ 
+#@app.route("/init", methods=["GET"])
+#def init_db():
+#    conn = get_db_connection()
+#    conn.execute("""
+#                 CREATE TABLE IF NOT EXISTS products(
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
+#                 name TEXT NOT NULL,
+#                 price REAL NOT NULL
+#                 )
+#                 """)
+#    conn.execute("""
+#                 CREATE TABLE IF NOT EXISTS users(
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
+#                 username TEXT UNIQUE NOT NULL,
+#                 password TEXT NOT NULL
+#                 )
+#                 """)
+#    conn.commit()
+#    conn.close()
+#    return jsonify({"message": "Database Inint complete"})
+
+@app.route("/init", methods=["GET"]) # Optional: Keep this for manual checks if needed
+def init_db_route():
+    try:
+        init_db() # Call the function
+        return jsonify({"message": "Database Init via Route complete"})
+    except Exception as e:
+        return jsonify({"error": f"DB Init failed: {str(e)}"}), 500
+
+# --- Initialize Database on Application Startup ---
+# This runs when the app object is created, hopefully before the first request on Render
+with app.app_context(): # Necessary to use application-specific contexts like g or current_app
+    init_db()
 
 @app.route("/")
 def home():
@@ -152,7 +190,7 @@ def login():
         return jsonify({"error": "Invalid credentials"}), 401
     
 
-if __name__ == "__main__":
-    with app.app_context():
-        init_db()
-    app.run(debug=True)
+#if __name__ == "__main__":
+#    with app.app_context():
+#        init_db()
+#    app.run(debug=True)
