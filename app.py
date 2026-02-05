@@ -19,16 +19,30 @@ def require_token(f):
 
 app=Flask(__name__)
 
+#CORS(app, resources={
+#    r"/products": {
+#        "origins": ["*"], # Allows all origins - CHANGE THIS FOR PRODUCTION!
+#        # Example for specific localhost port: "origins": ["http://localhost:5500"]
+#        # Example for file:// access (less reliable): "origins": ["null"] or ["*"]
+#    },
+#    r"/register": { # Apply CORS to register endpoint as well
+#        "origins": ["*"], # Allows all origins - CHANGE THIS FOR PRODUCTION!
+#    }
+#})
+
 CORS(app, resources={
     r"/products": {
-        "origins": ["*"], # Allows all origins - CHANGE THIS FOR PRODUCTION!
-        # Example for specific localhost port: "origins": ["http://localhost:5500"]
-        # Example for file:// access (less reliable): "origins": ["null"] or ["*"]
+        "origins": ["*"], # Adjust for production
+        "methods": ["GET"], # Explicitly state allowed methods
+        "allow_headers": [] # No specific headers needed for GET usually
     },
-    r"/register": { # Apply CORS to register endpoint as well
-        "origins": ["*"], # Allows all origins - CHANGE THIS FOR PRODUCTION!
+    r"/register": { # Configure the /register endpoint
+        "origins": ["*"], # Adjust for production - specify your web_client origin
+        "methods": ["POST"], # Allow POST method
+        "allow_headers": ["Content-Type", "X-Requested-With"] # Allow common headers for POST
     }
 })
+
 #products = [
 #        {"id": 1, "name": "Keyboard", "price": 49.99},
 #        {"id": 2, "name": "Mouse", "price": 29.99}
