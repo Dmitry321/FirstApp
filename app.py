@@ -19,9 +19,16 @@ def require_token(f):
 
 app=Flask(__name__)
 
-# Allow specific origin
-CORS(app, origins=['http://localhost:5500'])  # Replace with your local app port
-
+CORS(app, resources={
+    r"/products": {
+        "origins": ["*"], # Allows all origins - CHANGE THIS FOR PRODUCTION!
+        # Example for specific localhost port: "origins": ["http://localhost:5500"]
+        # Example for file:// access (less reliable): "origins": ["null"] or ["*"]
+    },
+    r"/register": { # Apply CORS to register endpoint as well
+        "origins": ["*"], # Allows all origins - CHANGE THIS FOR PRODUCTION!
+    }
+})
 #products = [
 #        {"id": 1, "name": "Keyboard", "price": 49.99},
 #        {"id": 2, "name": "Mouse", "price": 29.99}
